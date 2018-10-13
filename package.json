@@ -1,0 +1,17 @@
+{
+  "name": "vue-dnd-list",
+  "version": "0.1.0",
+  "description": "Flexible drag-n-drop list sorting with user defined content and -animations.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "list",
+    "sortable",
+    "draggable",
+    "dnd"
+  ],
+  "author": "Andreas Flöjt",
+  "license": "MIT"
+}
