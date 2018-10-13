@@ -6,9 +6,34 @@
         listItem,
         index,
         isGhost: sortIndex === index,
+        helper: null,
+        sorting,
         startDrag: () => handleStart(index),
       }"
     />
+    <slot
+      name="helper"
+      v-if="sorting"
+      v-bind="{
+        listItem: value[sortIndex],
+        index: sortIndex,
+        isGhost: false,
+        helper,
+        sorting,
+        startDrag: () => {},
+      }"
+    >
+      <slot
+        v-bind="{
+          listItem: value[sortIndex],
+          index: sortIndex,
+          isGhost: false,
+          helper,
+          sorting,
+          startDrag: () => {},
+        }"
+      />
+    </slot>
   </transition-group>
 </template>
 
@@ -16,6 +41,9 @@
 export default {
   data: () => ({
     sortIndex: null,
+    sorting: false,
+    helper: {
+    },
   }),
 
   props: {
@@ -33,6 +61,8 @@ export default {
 
       window.addEventListener("mousemove", this.handleSortMove, true);
       window.addEventListener("mouseup", this.handleSortEnd, true);
+
+      this.sorting = true;
     },
 
     handleSortMove(e) {
@@ -44,6 +74,10 @@ export default {
 
       window.removeEventListener("mousemove", this.handleSortMove, true);
       window.removeEventListener("mouseup", this.handleSortEnd, true);
+
+      this.sortIndex = null;
+
+      this.sorting = false;
     },
   },
 }
