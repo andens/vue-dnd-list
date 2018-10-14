@@ -27,5 +27,14 @@ export default {
       this.nodeTracker.remove(this.index);
     }
   },
+
+  watch: {
+    index(newIndex) {
+      if (!this.helper) {
+        this.nodeTracker.remove(this.index);
+        this.nodeTracker.add(this.index, this.$el);
+      }
+    },
+  },
 }
 </script>
