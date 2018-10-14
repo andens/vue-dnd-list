@@ -1,8 +1,11 @@
 <template>
-  <div>
-    <transition-group :name="transitionName" tag="div" :class="transitionGroupClass">
+  <transition-group :name="transitionName" tag="div" @after-leave="afterLeave">
+    <div
+      v-for="(listItem, index) in value"
+      :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
+      :class="listItemClass"
+    >
       <slot
-        v-for="(listItem, index) in value"
         v-bind="{
           listItem,
           index,
@@ -13,11 +16,14 @@
           startDrag: (e) => handleStart(e, index),
         }"
       />
-    </transition-group>
-    <transition :name="transitionName" @after-leave="helperAfterLeave">
+    </div>
+    <div
+      :key="helperItemKey"
+      v-if="sorting"
+      :class="[listItemClass, helperItemClass]"
+    >
       <slot
         name="helper"
-        v-if="sorting"
         v-bind="{
           listItem: value[sortIndex],
           index: sortIndex,
@@ -40,8 +46,8 @@
           }"
         />
       </slot>
-    </transition>
-  </div>
+    </div>
+  </transition-group>
 </template>
 
 <script>
@@ -59,7 +65,10 @@ export default {
   props: {
     value: { type: Array, required: true },
     transitionName: { type: String, default: "dnd-list" },
-    transitionGroupClass: { type: String, default: "dnd-transition-group" },
+    listItemClass: { type: String, default: "dnd-list-item" },
+    helperItemClass: { type: String, default: "dnd-helper-item" },
+    itemKeyProperty: { type: String, default: null },
+    helperItemKey: { type: Number, default: -1 },
     activationDelay: { type: Number, default: 0 },
     activationDistance: { type: Number, default: 0 },
   },
@@ -130,7 +139,7 @@ export default {
       }
     },
 
-    helperAfterLeave(el) {
+    afterLeave(el) {
       this.sortIndex = null;
       this.settling = false;
     },
