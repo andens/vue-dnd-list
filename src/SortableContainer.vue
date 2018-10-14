@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import NodeTracker from "./nodeTracker.js";
 import ListItem from "./ListItem.vue";
 
 export default {
@@ -69,6 +70,7 @@ export default {
     helperTranslation: { x: 0, y: 0 },
     activationTimer: null, // Tracker for when `activationDelay` is used
     startPosition: { x: 0, y: 0 }, // Tracker for when `activationDistance` is used
+    nodeTracker: new NodeTracker(),
   }),
 
   props: {
@@ -80,6 +82,12 @@ export default {
     helperItemKey: { type: Number, default: -1 },
     activationDelay: { type: Number, default: 0 },
     activationDistance: { type: Number, default: 0 },
+  },
+
+  provide() {
+    return {
+      nodeTracker: this.nodeTracker,
+    }
   },
 
   methods: {
@@ -149,8 +157,10 @@ export default {
     },
 
     afterLeave(el) {
-      this.sortIndex = null;
-      this.settling = false;
+      if (el === this.nodeTracker.getHelperNode()) {
+        this.sortIndex = null;
+        this.settling = false;
+      }
     },
 
     checkActivationDistanceConstraint(e) {
