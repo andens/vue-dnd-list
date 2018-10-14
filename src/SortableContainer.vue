@@ -13,7 +13,7 @@
         }"
       />
     </transition-group>
-    <transition :name="transitionName">
+    <transition :name="transitionName" @after-leave="helperAfterLeave">
       <slot
         name="helper"
         v-if="sorting"
@@ -81,6 +81,10 @@ export default {
       window.removeEventListener("mouseup", this.handleSortEnd, true);
 
       this.sorting = false;
+    },
+
+    helperAfterLeave(el) {
+      this.sortIndex = null;
     },
   },
 }
