@@ -147,6 +147,24 @@ export default {
         this.sorting = true;
       }
     },
+
+    // Swaps places with the sort item and its neighbor, if one is available.
+    // If the argument is truthy, the right-hand neighbor is swapped, otherwise
+    // the left-hand one is swapped.
+    moveSortItem(right) {
+      if (right && this.sortIndex + 1 < this.value.length) {
+        var x = this.value.splice(this.sortIndex, 1);
+        this.value.splice(this.sortIndex + 1, 0, ...x);
+        this.sortIndex += 1;
+        this.$emit("input", this.value);
+      }
+      else if (!right && this.sortIndex > 0) {
+        var x = this.value.splice(this.sortIndex - 1, 1);
+        this.value.splice(this.sortIndex, 0, ...x);
+        this.sortIndex -= 1;
+        this.$emit("input", this.value);
+      }
+    },
   },
 }
 </script>
