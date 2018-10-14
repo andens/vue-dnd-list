@@ -25,3 +25,11 @@ The slot content is repeated for each element in `v-model` and scoped with the f
 Note that an item can be a ghost despite not actively sorting. This happens before sorting has been activated due to press delay and drag threshold constraints, if used. It also happens during the settling phase after sorting has ended.
 
 Helper item markup can be provided in a slot named `helper`. If not present, the main slot is used for the helper item. Both kinds of slots are scoped the same way.
+
+== Internal details
+
+`NodeTracker` is used to track a sorted array of nodes that corresponds to the elements in `value`. `ListItem` instances update the tracker as they are created, destroyed, and detect changes in their `index` property.
+
+Directives were investigated, but a separate component could look for changes specifically in index. Considering that it didn't work to just pass the container instance, a separate object had to be used and dependency injection turned out to be a clean way of doing so (as in vue-slicksort).
+
+The helper node is also tracked in `NodeTracker`. Emitting an event from the helper item component when it's destroyed doesn't work as the transition continues. Instead, we need to check whether the `after-leave` invocation was done for the helper node. Using the node tracker we can compare against the element that the helper added.
