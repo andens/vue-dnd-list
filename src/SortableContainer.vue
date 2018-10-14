@@ -9,6 +9,7 @@
           isGhost: sortIndex === index,
           helper: null,
           sorting,
+          settling,
           startDrag: () => handleStart(index),
         }"
       />
@@ -23,6 +24,7 @@
           isGhost: false,
           helper,
           sorting,
+          settling,
           startDrag: () => {},
         }"
       >
@@ -33,6 +35,7 @@
             isGhost: false,
             helper,
             sorting,
+            settling,
             startDrag: () => {},
           }"
         />
@@ -46,6 +49,7 @@ export default {
   data: () => ({
     sortIndex: null,
     sorting: false,
+    settling: false,
     helper: {
     },
   }),
@@ -81,10 +85,12 @@ export default {
       window.removeEventListener("mouseup", this.handleSortEnd, true);
 
       this.sorting = false;
+      this.settling = true;
     },
 
     helperAfterLeave(el) {
       this.sortIndex = null;
+      this.settling = false;
     },
   },
 }

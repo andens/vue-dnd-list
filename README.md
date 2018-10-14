@@ -12,6 +12,7 @@ The slot content is repeated for each element in `v-model` and scoped with the f
 * `helper` - Object for the helper item, null otherwise.
   * _TODO: make these_
 * `sorting` - Specifies whether sorting is active or not.
+* `settling` - Specifies whether sorting has recently finished and transitions are settling.
 * `startDrag` - Selects the item for dragging. Intended to be called in response to a `mousedown` event on the areas of the list items that the user wants to be draggable.
 
 Note that an item can be a ghost despite not actively sorting. This happens before sorting has been activated due to press delay and drag threshold constraints, if used. It also happens during the settling phase after sorting has ended.
