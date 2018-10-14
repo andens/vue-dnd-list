@@ -21,6 +21,11 @@
       :key="helperItemKey"
       v-if="sorting"
       :class="[listItemClass, helperItemClass]"
+      :style="{
+        position: 'absolute',
+        left: `${helperTranslation.x}px`,
+        top: `${helperTranslation.y}px`,
+      }"
     >
       <slot
         name="helper"
@@ -56,8 +61,7 @@ export default {
     sortIndex: null,
     sorting: false,
     settling: false,
-    helper: {
-    },
+    helperTranslation: { x: 0, y: 0 },
     activationTimer: null, // Tracker for when `activationDelay` is used
     startPosition: { x: 0, y: 0 }, // Tracker for when `activationDistance` is used
   }),
