@@ -17,6 +17,15 @@ export default {
     if (this.helper === true) {
       this.nodeTracker.setHelperNode(this.$el);
     }
+    else {
+      this.nodeTracker.add(this.index, this.$el);
+    }
+  },
+
+  beforeDestroy() {
+    if (!this.helper) {
+      this.nodeTracker.remove(this.index);
+    }
   },
 }
 </script>
