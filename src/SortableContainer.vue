@@ -1,29 +1,22 @@
 <template>
-  <transition-group :name="transitionName" tag="div">
-    <slot
-      v-for="(listItem, index) in value"
-      v-bind="{
-        listItem,
-        index,
-        isGhost: sortIndex === index,
-        helper: null,
-        sorting,
-        startDrag: () => handleStart(index),
-      }"
-    />
-    <slot
-      name="helper"
-      v-if="sorting"
-      v-bind="{
-        listItem: value[sortIndex],
-        index: sortIndex,
-        isGhost: false,
-        helper,
-        sorting,
-        startDrag: () => {},
-      }"
-    >
+  <div>
+    <transition-group :name="transitionName" tag="div" :class="transitionGroupClass">
       <slot
+        v-for="(listItem, index) in value"
+        v-bind="{
+          listItem,
+          index,
+          isGhost: sortIndex === index,
+          helper: null,
+          sorting,
+          startDrag: () => handleStart(index),
+        }"
+      />
+    </transition-group>
+    <transition :name="transitionName">
+      <slot
+        name="helper"
+        v-if="sorting"
         v-bind="{
           listItem: value[sortIndex],
           index: sortIndex,
@@ -32,9 +25,20 @@
           sorting,
           startDrag: () => {},
         }"
-      />
-    </slot>
-  </transition-group>
+      >
+        <slot
+          v-bind="{
+            listItem: value[sortIndex],
+            index: sortIndex,
+            isGhost: false,
+            helper,
+            sorting,
+            startDrag: () => {},
+          }"
+        />
+      </slot>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -49,6 +53,7 @@ export default {
   props: {
     value: { type: Array, required: true },
     transitionName: { type: String, default: "dnd-list" },
+    transitionGroupClass: { type: String, default: "dnd-transition-group" },
   },
 
   methods: {
@@ -74,8 +79,6 @@ export default {
 
       window.removeEventListener("mousemove", this.handleSortMove, true);
       window.removeEventListener("mouseup", this.handleSortEnd, true);
-
-      this.sortIndex = null;
 
       this.sorting = false;
     },

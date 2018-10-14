@@ -2,6 +2,8 @@ The items that are used in the slot must specify the `key` property because they
 
 The `transitionName` property sets the `name` property of the internal `transition-group`. Default to `dnd-list`.
 
+The `transitionGroupClass` property defines a class that is applied to the `transition-group` wrapping the list items. Defaults to `dnd-transition-group`.
+
 The slot content is repeated for each element in `v-model` and scoped with the following data:
 
 * `listItem` - Element data of `v-model`.
