@@ -19,8 +19,7 @@ The slot content is repeated for each element in `v-model` and scoped with the f
 * `listItem` - Element data of `v-model`.
 * `index` - Index of the element in `v-model`.
 * `isGhost` - True for the item that is chosen for dragging.
-* `helper` - Object for the helper item, null otherwise.
-  * _TODO: make these_
+* `isHelper` - True for the helper item.
 * `sorting` - Specifies whether sorting is active or not.
 * `settling` - Specifies whether sorting has recently finished and transitions are settling.
 * `startDrag` - Selects the item for dragging. Intended to be called in response to a `mousedown` event on the areas of the list items that the user wants to be draggable.
