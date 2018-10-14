@@ -78,7 +78,7 @@ export default {
       // If an activation delay is set, wait before entering the sorting phase.
       if (this.activationDelay > 0) {
         this.activationTimer = setTimeout(
-          () => this.sorting = true,
+          () => this.activateSorting(),
           this.activationDelay
         );
       }
@@ -89,7 +89,7 @@ export default {
       }
       // Neither activation delay nor -distance is used: activate immediately
       else {
-        this.sorting = true;
+        this.activateSorting();
       }
     },
 
@@ -144,8 +144,12 @@ export default {
       const distSq = delta.x * delta.x + delta.y * delta.y;
 
       if (distSq > this.activationDistance * this.activationDistance) {
-        this.sorting = true;
+        this.activateSorting();
       }
+    },
+
+    activateSorting() {
+      this.sorting = true;
     },
 
     // Swaps places with the sort item and its neighbor, if one is available.
