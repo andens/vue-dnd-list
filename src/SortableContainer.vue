@@ -1,9 +1,10 @@
 <template>
   <transition-group :name="transitionName" tag="div" @after-leave="afterLeave">
-    <div
+    <list-item
       v-for="(listItem, index) in value"
       :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
       :class="listItemClass"
+      :index="index"
     >
       <slot
         v-bind="{
@@ -16,8 +17,8 @@
           startDrag: (e) => handleStart(e, index),
         }"
       />
-    </div>
-    <div
+    </list-item>
+    <list-item
       :key="helperItemKey"
       v-if="sorting"
       :class="[listItemClass, helperItemClass]"
@@ -26,6 +27,8 @@
         left: `${helperTranslation.x}px`,
         top: `${helperTranslation.y}px`,
       }"
+      :index="sortIndex"
+      :helper=true
     >
       <slot
         name="helper"
@@ -51,11 +54,13 @@
           }"
         />
       </slot>
-    </div>
+    </list-item>
   </transition-group>
 </template>
 
 <script>
+import ListItem from "./ListItem.vue";
+
 export default {
   data: () => ({
     sortIndex: null,
@@ -182,6 +187,10 @@ export default {
         this.$emit("input", this.value);
       }
     },
+  },
+
+  components: {
+    ListItem,
   },
 }
 </script>
