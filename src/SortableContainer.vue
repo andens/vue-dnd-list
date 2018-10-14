@@ -1,5 +1,5 @@
 <template>
-  <transition-group :name="transitionName" tag="div" @after-leave="afterLeave">
+  <transition-group :name="transitionName" tag="div" ref="container" @after-leave="afterLeave">
     <list-item
       v-for="(listItem, index) in value"
       :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
@@ -71,6 +71,7 @@ export default {
     activationTimer: null, // Tracker for when `activationDelay` is used
     startPosition: { x: 0, y: 0 }, // Mouse position at the time of activation.
     helperStartPosition: { x: 0, y: 0 }, // Offset of the sort item when sorting is activated.
+    startScroll: { x: 0, y: 0 }, // Container scroll at time of activation.
     nodeTracker: new NodeTracker(),
   }),
 
@@ -142,8 +143,9 @@ export default {
         return;
       }
 
-      this.helperTranslation.x = this.helperStartPosition.x + (e.pageX - this.startPosition.x);
-      this.helperTranslation.y = this.helperStartPosition.y + (e.pageY - this.startPosition.y);
+      const {scrollLeft, scrollTop} = this.$refs.container.$el;
+      this.helperTranslation.x = this.helperStartPosition.x + (e.pageX - this.startPosition.x) + (scrollLeft - this.startScroll.x);
+      this.helperTranslation.y = this.helperStartPosition.y + (e.pageY - this.startPosition.y) + (scrollTop - this.startScroll.y);
     },
 
     handleSortEnd(e) {
@@ -198,6 +200,8 @@ export default {
       this.helperStartPosition.y = sortNode.offsetTop;
       this.helperTranslation.x = this.helperStartPosition.x;
       this.helperTranslation.y = this.helperStartPosition.y;
+      this.startScroll.x = this.$refs.container.$el.scrollLeft;
+      this.startScroll.y = this.$refs.container.$el.scrollTop;
       this.sorting = true;
     },
 
