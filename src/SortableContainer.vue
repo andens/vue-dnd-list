@@ -10,7 +10,7 @@
           helper: null,
           sorting,
           settling,
-          startDrag: () => handleStart(index),
+          startDrag: (e) => handleStart(e, index),
         }"
       />
     </transition-group>
@@ -52,7 +52,8 @@ export default {
     settling: false,
     helper: {
     },
-    activationTimer: null,
+    activationTimer: null, // Tracker for when `activationDelay` is used
+    startPosition: { x: 0, y: 0 }, // Tracker for when `activationDistance` is used
   }),
 
   props: {
@@ -60,10 +61,11 @@ export default {
     transitionName: { type: String, default: "dnd-list" },
     transitionGroupClass: { type: String, default: "dnd-transition-group" },
     activationDelay: { type: Number, default: 0 },
+    activationDistance: { type: Number, default: 0 },
   },
 
   methods: {
-    handleStart(index) {
+    handleStart(e, index) {
       if (this.sortIndex !== null) {
         return;
       }
@@ -80,13 +82,24 @@ export default {
           this.activationDelay
         );
       }
+      // Set a frame of reference for when activation distance is used.
+      else if (this.activationDistance > 0) {
+        this.startPosition.x = e.pageX;
+        this.startPosition.y = e.pageY;
+      }
+      // Neither activation delay nor -distance is used: activate immediately
+      else {
+        this.sorting = true;
+      }
     },
 
     handleSortMove(e) {
       e.stopPropagation();
 
+      // Sorting has not begun and we are not waiting for an activation delay.
+      // This is when drag distance is used to activate sorting.
       if (!this.sorting && this.activationDelay === 0) {
-        this.sorting = true;
+        this.checkActivationDistanceConstraint(e);
       }
 
       if (!this.sorting) {
@@ -120,6 +133,19 @@ export default {
     helperAfterLeave(el) {
       this.sortIndex = null;
       this.settling = false;
+    },
+
+    checkActivationDistanceConstraint(e) {
+      const delta = {
+        x: this.startPosition.x - e.pageX,
+        y: this.startPosition.y - e.pageY,
+      };
+
+      const distSq = delta.x * delta.x + delta.y * delta.y;
+
+      if (distSq > this.activationDistance * this.activationDistance) {
+        this.sorting = true;
+      }
     },
   },
 }

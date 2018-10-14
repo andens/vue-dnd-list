@@ -4,7 +4,9 @@ The `transitionName` property sets the `name` property of the internal `transiti
 
 The `transitionGroupClass` property defines a class that is applied to the `transition-group` wrapping the list items. Defaults to `dnd-transition-group`.
 
-The `activationDelay` property specifies a delay until sorting is activated after starting to drag.
+The `activationDelay` property specifies a delay until sorting is activated after starting to drag. If `activationDistance` is also specified, `activationDelay` takes precedence.
+
+The `activationDistance` property specifies a distance that must be dragged before sorting is activated. If `activationDelay` is also specified, `activationDelay` takes precedence.
 
 The slot content is repeated for each element in `v-model` and scoped with the following data:
 
