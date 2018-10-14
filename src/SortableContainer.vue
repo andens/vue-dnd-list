@@ -177,6 +177,9 @@ export default {
     },
 
     activateSorting() {
+      const sortNode = this.nodeTracker.getNodes()[this.sortIndex];
+      this.helperTranslation.x = sortNode.offsetLeft;
+      this.helperTranslation.y = sortNode.offsetTop;
       this.sorting = true;
     },
 
