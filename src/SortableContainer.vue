@@ -1,5 +1,10 @@
 <template>
-  <transition-group :name="transitionName" tag="div" ref="container" @after-leave="afterLeave">
+  <transition-group
+    :name="transitionName"
+    tag="div"
+    ref="container"
+    @after-leave="afterLeave"
+  >
     <list-item
       v-for="(listItem, index) in value"
       :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
@@ -72,6 +77,7 @@ export default {
     startPosition: { x: 0, y: 0 }, // Mouse position at the time of activation.
     helperStartPosition: { x: 0, y: 0 }, // Offset of the sort item when sorting is activated.
     startScroll: { x: 0, y: 0 }, // Container scroll at time of activation.
+    latestMousePosition: { x: 0, y: 0 },
     nodeTracker: new NodeTracker(),
   }),
 
@@ -103,13 +109,8 @@ export default {
       window.addEventListener("mousemove", this.handleSortMove, true);
       window.addEventListener("mouseup", this.handleSortEnd, true);
 
-      // If no particular constraint is set, this is the proper start position.
-      // If using drag activation, this is used as the offset base to determine
-      // whether the constraint has been met. Delay activation overwrites this
-      // on mouse moves, but requires this value as a default if the mouse is
-      // not moved during the countdown.
-      this.startPosition.x = e.pageX;
-      this.startPosition.y = e.pageY;
+      this.latestMousePosition.x = e.pageX;
+      this.latestMousePosition.y = e.pageY;
 
       // If an activation delay is set, wait before entering the sorting phase.
       if (this.activationDelay > 0) {
@@ -118,8 +119,14 @@ export default {
           this.activationDelay
         );
       }
+      // When using drag activation, `startPosition` is used for calculating
+      // the offset to determine whether the drag constraint is satisfied.
+      else if (this.activationDistance > 0) {
+        this.startPosition.x = this.latestMousePosition.x;
+        this.startPosition.y = this.latestMousePosition.y;
+      }
       // Neither activation delay nor -distance is used: activate immediately
-      else if (this.activationDistance === 0) {
+      else {
         this.activateSorting();
       }
     },
@@ -127,16 +134,13 @@ export default {
     handleSortMove(e) {
       e.stopPropagation();
 
-      // Track the mouse position so that the drag offset is later calculated
-      // from the mouse position at the time of activation.
-      if (!this.sorting && this.activationDelay > 0) {
-        this.startPosition.x = e.pageX;
-        this.startPosition.y = e.pageY;
-      }
+      this.latestMousePosition.x = e.pageX;
+      this.latestMousePosition.y = e.pageY;
+
       // Sorting has not begun and we are not waiting for an activation delay.
       // This is when drag distance is used to activate sorting.
-      else if (!this.sorting && this.activationDelay === 0) {
-        this.checkActivationDistanceConstraint(e);
+      if (!this.sorting && this.activationDelay === 0) {
+        this.checkActivationDistanceConstraint();
       }
 
       if (!this.sorting) {
@@ -178,18 +182,15 @@ export default {
       }
     },
 
-    checkActivationDistanceConstraint(e) {
+    checkActivationDistanceConstraint() {
       const delta = {
-        x: this.startPosition.x - e.pageX,
-        y: this.startPosition.y - e.pageY,
+        x: this.startPosition.x - this.latestMousePosition.x,
+        y: this.startPosition.y - this.latestMousePosition.y,
       };
 
       const distSq = delta.x * delta.x + delta.y * delta.y;
 
       if (distSq > this.activationDistance * this.activationDistance) {
-        // Use the current mouse position at the time of activation.
-        this.startPosition.x = e.pageX;
-        this.startPosition.y = e.pageY;
         this.activateSorting();
       }
     },
@@ -200,6 +201,8 @@ export default {
       this.helperStartPosition.y = sortNode.offsetTop;
       this.helperTranslation.x = this.helperStartPosition.x;
       this.helperTranslation.y = this.helperStartPosition.y;
+      this.startPosition.x = this.latestMousePosition.x;
+      this.startPosition.y = this.latestMousePosition.y;
       this.startScroll.x = this.$refs.container.$el.scrollLeft;
       this.startScroll.y = this.$refs.container.$el.scrollTop;
       this.sorting = true;
