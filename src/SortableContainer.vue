@@ -147,9 +147,7 @@ export default {
         return;
       }
 
-      const {scrollLeft, scrollTop} = this.$refs.container.$el;
-      this.helperTranslation.x = this.helperStartPosition.x + (e.pageX - this.startPosition.x) + (scrollLeft - this.startScroll.x);
-      this.helperTranslation.y = this.helperStartPosition.y + (e.pageY - this.startPosition.y) + (scrollTop - this.startScroll.y);
+      this.synchronizeHelperTranslation();
     },
 
     handleSortEnd(e) {
@@ -206,6 +204,14 @@ export default {
       this.startScroll.x = this.$refs.container.$el.scrollLeft;
       this.startScroll.y = this.$refs.container.$el.scrollTop;
       this.sorting = true;
+    },
+
+    synchronizeHelperTranslation() {
+      if (this.sorting) {
+        const {scrollLeft, scrollTop} = this.$refs.container.$el;
+        this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
+        this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
+      }
     },
 
     // Swaps places with the sort item and its neighbor, if one is available.

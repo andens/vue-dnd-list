@@ -26,6 +26,8 @@ Note that an item can be a ghost despite not actively sorting. This happens befo
 
 Helper item markup can be provided in a slot named `helper`. If not present, the main slot is used for the helper item. Both kinds of slots are scoped the same way.
 
+If the list items change viewport position under circumstances outside of `vue-dnd-list` while sorting is active, `synchronizeHelperTranslation` may be called on a `SortableContainer` instance to immediately synchronize the helper position.
+
 == Internal details
 
 `NodeTracker` is used to track a sorted array of nodes that corresponds to the elements in `value`. `ListItem` instances update the tracker as they are created, destroyed, and detect changes in their `index` property.
