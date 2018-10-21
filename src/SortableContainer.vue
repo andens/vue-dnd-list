@@ -146,10 +146,6 @@ export default {
         this.checkActivationDistanceConstraint();
       }
 
-      if (!this.sorting) {
-        return;
-      }
-
       this.synchronizeHelperTranslation();
     },
 
@@ -210,11 +206,14 @@ export default {
     },
 
     synchronizeHelperTranslation() {
-      if (this.sorting) {
-        const {scrollLeft, scrollTop} = this.$refs.container.$el;
-        this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
-        this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
+      if (!this.sorting) {
+        return;
       }
+
+      // Set the new translation.
+      const {scrollLeft, scrollTop} = this.$refs.container.$el;
+      this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
+      this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
     },
 
     // Swaps places with the sort item and its neighbor, if one is available.
