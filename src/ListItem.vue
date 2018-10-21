@@ -28,6 +28,12 @@ export default {
     }
   },
 
+  destroyed() {
+    if (this.helper === true) {
+      this.nodeTracker.unsetHelperNode();
+    }
+  },
+
   watch: {
     index(newIndex) {
       if (!this.helper) {

@@ -2,10 +2,16 @@ export default class NodeTracker {
   constructor() {
     this.nodes = [];
     this.helperNode = null;
+    this.isHelperNodeActive = false;
   }
 
   setHelperNode(node) {
     this.helperNode = node;
+    this.isHelperNodeActive = true;
+  }
+
+  unsetHelperNode() {
+    this.isHelperNodeActive = false;
   }
 
   add(index, el) {
@@ -18,6 +24,10 @@ export default class NodeTracker {
 
   getHelperNode() {
     return this.helperNode;
+  }
+
+  hasActiveHelperNode() {
+    return this.isHelperNodeActive;
   }
 
   getNodes() {

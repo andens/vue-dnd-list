@@ -210,10 +210,19 @@ export default {
         return;
       }
 
+      const prevTranslation = { x: this.helperTranslation.x, y: this.helperTranslation.y };
+
       // Set the new translation.
       const {scrollLeft, scrollTop} = this.$refs.container.$el;
       this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
       this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
+
+      if (this.nodeTracker.hasActiveHelperNode()) {
+        this.sortItems(prevTranslation);
+      }
+      else {
+        this.$nextTick(() => this.sortItems(prevTranslation));
+      }
     },
 
     sortItems(prevTranslation) {

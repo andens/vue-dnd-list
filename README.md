@@ -30,7 +30,7 @@ Note that an item can be a ghost despite not actively sorting. This happens befo
 
 Helper item markup can be provided in a slot named `helper`. If not present, the main slot is used for the helper item. Both kinds of slots are scoped the same way.
 
-If the list items change viewport position under circumstances outside of `vue-dnd-list` while sorting is active, `synchronizeHelperTranslation` may be called on a `SortableContainer` instance to immediately synchronize the helper position.
+If the list items change viewport position under circumstances outside of `vue-dnd-list` while sorting is active, `synchronizeHelperTranslation` may be called on a `SortableContainer` instance to immediately synchronize the helper position. This moves the helper item into place and sorts items according to the updated position.
 
 == Internal details
 
