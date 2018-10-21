@@ -83,6 +83,7 @@ export default {
 
   props: {
     value: { type: Array, required: true },
+    orientation: { type: String, default: "y", validator: v => v === "x" || v === "y" },
     transitionName: { type: String, default: "dnd-list" },
     listItemClass: { type: String, default: "dnd-list-item" },
     helperItemClass: { type: String, default: "dnd-helper-item" },
