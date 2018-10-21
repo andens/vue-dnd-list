@@ -31,6 +31,7 @@
         position: 'absolute',
         left: `${helperTranslation.x}px`,
         top: `${helperTranslation.y}px`,
+        zIndex: helperZ,
       }"
       :index="sortIndex"
       :helper=true
@@ -91,6 +92,7 @@ export default {
     helperItemKey: { type: Number, default: -1 },
     activationDelay: { type: Number, default: 0 },
     activationDistance: { type: Number, default: 0 },
+    helperZ: { type: Number, default: 0 },
   },
 
   provide() {

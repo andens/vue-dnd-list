@@ -14,6 +14,8 @@ The `activationDelay` property specifies a delay until sorting is activated afte
 
 The `activationDistance` property specifies a distance that must be dragged before sorting is activated. If `activationDelay` is also specified, `activationDelay` takes precedence.
 
+The `helperZ` property sets the z-index to use for the wrapper of the helper item. It's a bit of a hack to work around some transition issues where the use of transform creates a new stacking context for the helper item as it's being transitioned, making its z-index independent of the other items. Defaults to 0.
+
 The slot content is repeated for each element in `v-model` and scoped with the following data:
 
 * `listItem` - Element data of `v-model`.
