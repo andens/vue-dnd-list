@@ -216,6 +216,47 @@ export default {
       this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
     },
 
+    sortItems(prevTranslation) {
+      const horizontal = this.orientation === "x";
+      const movement = horizontal
+        ? this.helperTranslation.x - prevTranslation.x
+        : this.helperTranslation.y - prevTranslation.y;
+      const checkDirection = Math.sign(movement);
+
+      if (checkDirection === 0) {
+        return;
+      }
+
+      const nodes = this.nodeTracker.getNodes();
+      const helperRect = this.nodeTracker.getHelperNode().getBoundingClientRect();
+
+      let checkNodeIndex = this.sortIndex + checkDirection;
+      while (checkNodeIndex >= 0 && checkNodeIndex < nodes.length) {
+        const node = nodes[checkNodeIndex];
+        const compareRect = node.getBoundingClientRect();
+        const compareRectMid = horizontal
+          ? compareRect.left + 0.5 * compareRect.width
+          : compareRect.top + 0.5 * compareRect.height;
+
+        let swap = false;
+        if (horizontal) {
+          swap = (movement > 0 && helperRect.right > compareRectMid) || (movement < 0 && helperRect.left < compareRectMid);
+        }
+        else {
+          swap = (movement > 0 && helperRect.bottom > compareRectMid) || (movement < 0 && helperRect.top < compareRectMid);
+        }
+
+        if (swap) {
+          this.moveSortItem(movement > 0);
+        }
+        else {
+          break;
+        }
+
+        checkNodeIndex += checkDirection;
+      }
+    },
+
     // Swaps places with the sort item and its neighbor, if one is available.
     // If the argument is truthy, the right-hand neighbor is swapped, otherwise
     // the left-hand one is swapped.
