@@ -1,13 +1,11 @@
 <template>
-  <transition-group
+  <div ref="container">
+  <transition
     :name="transitionName"
-    tag="div"
-    ref="container"
-    @after-leave="afterLeave"
-  >
-    <list-item
       v-for="(listItem, index) in value"
       :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
+  >
+    <list-item
       :class="listItemClass"
       :index="index"
     >
@@ -23,6 +21,11 @@
         }"
       />
     </list-item>
+  </transition>
+  <transition
+    :name="transitionName"
+    @after-leave="helperAfterLeave"
+  >
     <list-item
       :key="helperItemKey"
       v-if="sorting"
@@ -61,7 +64,8 @@
         />
       </slot>
     </list-item>
-  </transition-group>
+  </transition>
+  </div>
 </template>
 
 <script>
@@ -172,11 +176,9 @@ export default {
       }
     },
 
-    afterLeave(el) {
-      if (el === this.nodeTracker.getHelperNode()) {
-        this.sortIndex = null;
-        this.settling = false;
-      }
+    helperAfterLeave(el) {
+      this.sortIndex = null;
+      this.settling = false;
     },
 
     checkActivationDistanceConstraint() {
@@ -200,8 +202,8 @@ export default {
       this.helperTranslation.y = this.helperStartPosition.y;
       this.startPosition.x = this.latestMousePosition.x;
       this.startPosition.y = this.latestMousePosition.y;
-      this.startScroll.x = this.$refs.container.$el.scrollLeft;
-      this.startScroll.y = this.$refs.container.$el.scrollTop;
+      this.startScroll.x = this.$refs.container.scrollLeft;
+      this.startScroll.y = this.$refs.container.scrollTop;
       this.sorting = true;
     },
 
@@ -213,7 +215,7 @@ export default {
       const prevTranslation = { x: this.helperTranslation.x, y: this.helperTranslation.y };
 
       // Set the new translation.
-      const {scrollLeft, scrollTop} = this.$refs.container.$el;
+      const {scrollLeft, scrollTop} = this.$refs.container;
       this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
       this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
 

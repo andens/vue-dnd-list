@@ -1,14 +1,14 @@
 The `orientation` property determines whether the list is horizontal (`x`) or vertical (`y`).
 
-The `transitionName` property sets the `name` property of the internal `transition-group`. Default to `dnd-list`.
+The `transitionName` property sets the `name` property of the internal `transition` elements. Default to `dnd-list`.
 
 The `listItemClass` property defines a class that is applied to the element that wraps individual list items. Defaults to `dnd-list-item`. This class is also applied to the helper item.
 
 The `helperItemClass` property defines a class that is applied to the helper wrapper element. Defaults to `dnd-helper-item`.
 
-The `itemKeyProperty` property tells `vue-dnd-list` what property of items in `v-model` to use as key in the transition-group. Defaults to using the item index as key.
+The `itemKeyProperty` property tells `vue-dnd-list` what property of items in `v-model` to use as key in the rendered HTML. Defaults to using the item index as key.
 
-The `helperItemKey` property is the key to use for the helper item in the transition group. Defaults to `-1`.
+The `helperItemKey` property is the key to use for the helper item. Defaults to `-1`.
 
 The `activationDelay` property specifies a delay until sorting is activated after starting to drag. If `activationDistance` is also specified, `activationDelay` takes precedence.
 
