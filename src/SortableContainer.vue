@@ -276,16 +276,27 @@ export default {
     // If the argument is truthy, the right-hand neighbor is swapped, otherwise
     // the left-hand one is swapped.
     moveSortItem(right) {
+      let otherIndex = this.sortIndex;
+
       if (right && this.sortIndex + 1 < this.value.length) {
-        var x = this.value.splice(this.sortIndex, 1);
-        this.value.splice(this.sortIndex + 1, 0, ...x);
-        this.sortIndex += 1;
-        this.$emit("input", this.value);
+        otherIndex = this.sortIndex + 1;
       }
       else if (!right && this.sortIndex > 0) {
-        var x = this.value.splice(this.sortIndex - 1, 1);
-        this.value.splice(this.sortIndex, 0, ...x);
-        this.sortIndex -= 1;
+        otherIndex = this.sortIndex - 1;
+      }
+
+      if (otherIndex !== this.sortIndex) {
+        const sortNode = this.nodeTracker.getNodes()[this.sortIndex];
+        const otherNode = this.nodeTracker.getNodes()[otherIndex];
+
+        const sortItem = this.value[this.sortIndex];
+        const otherItem = this.value[otherIndex];
+
+        this.value.splice(this.sortIndex, 1, otherItem);
+        this.value.splice(otherIndex, 1, sortItem);
+
+        this.sortIndex = otherIndex;
+
         this.$emit("input", this.value);
       }
     },
