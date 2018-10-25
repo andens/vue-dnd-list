@@ -93,6 +93,7 @@ export default {
   props: {
     value: { type: Array, required: true },
     orientation: { type: String, default: "y", validator: v => v === "x" || v === "y" },
+    lockAxis: { type: Boolean, default: false },
     scrollContainerClass: { type: String, default: "dnd-scroll-container" },
     transitionName: { type: String, default: "dnd-list" },
     listItemClass: { type: String, default: "dnd-list-item" },
@@ -229,9 +230,14 @@ export default {
       const prevTranslation = { x: this.helperTranslation.x, y: this.helperTranslation.y };
 
       // Set the new translation.
-      const {scrollLeft, scrollTop} = this.$refs.scrollContainer;
-      this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
-      this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
+      if (!this.lockAxis || (this.lockAxis && this.orientation === "x")) {
+      const {scrollLeft} = this.$refs.scrollContainer;
+        this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
+      }
+      if (!this.lockAxis || (this.lockAxis && this.orientation === "y")) {
+      const {scrollTop} = this.$refs.scrollContainer;
+        this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
+      }
 
       if (this.nodeTracker.hasActiveHelperNode()) {
         this.sortItems(prevTranslation);

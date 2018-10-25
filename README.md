@@ -1,5 +1,7 @@
 The `orientation` property determines whether the list is horizontal (`x`) or vertical (`y`).
 
+The `lockAxis` property locks dragging to the axis defined by the `orientation` property if true. Otherwise the facade item may be moved freely. Defaults to false.
+
 The `scrollContainerClass` property is the class to apply to the wrapper element around sortable items. Defaults to `dnd-scroll-container`.
 
 The `transitionName` property sets the `name` property of the internal `transition` elements. Default to `dnd-list`.
