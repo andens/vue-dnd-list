@@ -1,59 +1,48 @@
 <template>
   <div ref="container">
     <div ref="scrollContainer" :class="scrollContainerClass" v-on="scrollContainerEvents">
-  <transition
-    :name="transitionName"
-      v-for="(listItem, index) in value"
-      :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
-  >
-    <list-item
-      :class="listItemClass"
-      :index="index"
-    >
-      <slot
-        v-bind="{
-          listItem,
-          index,
-          isGhost: sortIndex === index,
-          isHelper: false,
-          sorting,
-          settling,
-          startDrag: (e) => handleStart(e, index),
-        }"
-      />
-    </list-item>
-  </transition>
+      <transition
+        :name="transitionName"
+        v-for="(listItem, index) in value"
+        :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
+      >
+        <list-item
+          :class="listItemClass"
+          :index="index"
+        >
+          <slot
+            v-bind="{
+              listItem,
+              index,
+              isGhost: sortIndex === index,
+              isHelper: false,
+              sorting,
+              settling,
+              startDrag: (e) => handleStart(e, index),
+            }"
+          />
+        </list-item>
+      </transition>
     </div>
-  <transition
-    :name="transitionName"
-    @after-leave="helperAfterLeave"
-  >
-    <list-item
-      :key="helperItemKey"
-      v-if="sorting"
-      :class="[listItemClass, helperItemClass]"
-      :style="{
-        position: 'absolute',
-        left: `${helperTranslation.x - $refs.scrollContainer.scrollLeft}px`,
-        top: `${helperTranslation.y - $refs.scrollContainer.scrollTop}px`,
-        zIndex: helperZ,
-      }"
-      :index="sortIndex"
-      :helper=true
+    <transition
+      :name="transitionName"
+      @after-leave="helperAfterLeave"
     >
-      <slot
-        name="helper"
-        v-bind="{
-          listItem: value[sortIndex],
-          index: sortIndex,
-          isGhost: false,
-          isHelper: true,
-          sorting,
-          settling,
-          startDrag: () => {},
+      <list-item
+        :key="helperItemKey"
+        v-if="sorting"
+        :class="[listItemClass, helperItemClass]"
+        :style="{
+          position: 'absolute',
+          left: `${helperTranslation.x - $refs.scrollContainer.scrollLeft}px`,
+          top: `${helperTranslation.y - $refs.scrollContainer.scrollTop}px`,
+          zIndex: helperZ,
         }"
+        :index="sortIndex"
+        :helper=true
       >
         <slot
+          name="helper"
           v-bind="{
             listItem: value[sortIndex],
             index: sortIndex,
@@ -63,10 +52,21 @@
             settling,
             startDrag: () => {},
           }"
-        />
-      </slot>
-    </list-item>
-  </transition>
+        >
+          <slot
+            v-bind="{
+              listItem: value[sortIndex],
+              index: sortIndex,
+              isGhost: false,
+              isHelper: true,
+              sorting,
+              settling,
+              startDrag: () => {},
+            }"
+          />
+        </slot>
+      </list-item>
+    </transition>
   </div>
 </template>
 
