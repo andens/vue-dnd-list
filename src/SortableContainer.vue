@@ -1,5 +1,6 @@
 <template>
   <div ref="container">
+    <div ref="scrollContainer" :class="scrollContainerClass" v-on="scrollContainerEvents">
   <transition
     :name="transitionName"
       v-for="(listItem, index) in value"
@@ -22,6 +23,7 @@
       />
     </list-item>
   </transition>
+    </div>
   <transition
     :name="transitionName"
     @after-leave="helperAfterLeave"
@@ -32,8 +34,8 @@
       :class="[listItemClass, helperItemClass]"
       :style="{
         position: 'absolute',
-        left: `${helperTranslation.x}px`,
-        top: `${helperTranslation.y}px`,
+        left: `${helperTranslation.x - $refs.scrollContainer.scrollLeft}px`,
+        top: `${helperTranslation.y - $refs.scrollContainer.scrollTop}px`,
         zIndex: helperZ,
       }"
       :index="sortIndex"
@@ -77,7 +79,7 @@ export default {
     sortIndex: null,
     sorting: false,
     settling: false,
-    helperTranslation: { x: 0, y: 0 },
+    helperTranslation: { x: 0, y: 0 }, // Facade item translation as if it was inside the scroll container.
     activationTimer: null, // Tracker for when `activationDelay` is used
     startPosition: { x: 0, y: 0 }, // Mouse position at the time of activation.
     helperStartPosition: { x: 0, y: 0 }, // Offset of the sort item when sorting is activated.
@@ -89,6 +91,7 @@ export default {
   props: {
     value: { type: Array, required: true },
     orientation: { type: String, default: "y", validator: v => v === "x" || v === "y" },
+    scrollContainerClass: { type: String, default: "dnd-scroll-container" },
     transitionName: { type: String, default: "dnd-list" },
     listItemClass: { type: String, default: "dnd-list-item" },
     helperItemClass: { type: String, default: "dnd-helper-item" },
@@ -97,6 +100,7 @@ export default {
     activationDelay: { type: Number, default: 0 },
     activationDistance: { type: Number, default: 0 },
     helperZ: { type: Number, default: 0 },
+    scrollContainerEvents: { type: Object, default: null },
   },
 
   provide() {
@@ -202,8 +206,8 @@ export default {
       this.helperTranslation.y = this.helperStartPosition.y;
       this.startPosition.x = this.latestMousePosition.x;
       this.startPosition.y = this.latestMousePosition.y;
-      this.startScroll.x = this.$refs.container.scrollLeft;
-      this.startScroll.y = this.$refs.container.scrollTop;
+      this.startScroll.x = this.$refs.scrollContainer.scrollLeft;
+      this.startScroll.y = this.$refs.scrollContainer.scrollTop;
       this.sorting = true;
     },
 
@@ -215,7 +219,7 @@ export default {
       const prevTranslation = { x: this.helperTranslation.x, y: this.helperTranslation.y };
 
       // Set the new translation.
-      const {scrollLeft, scrollTop} = this.$refs.container;
+      const {scrollLeft, scrollTop} = this.$refs.scrollContainer;
       this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
       this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
 
@@ -284,6 +288,10 @@ export default {
         this.sortIndex -= 1;
         this.$emit("input", this.value);
       }
+    },
+
+    getScrollContainer() {
+      return this.$refs.scrollContainer;
     },
   },
 
