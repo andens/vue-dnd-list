@@ -27,6 +27,7 @@
     </div>
     <transition
       :name="transitionName"
+      @before-leave="helperBeforeLeave"
       @after-leave="helperAfterLeave"
     >
       <list-item
@@ -180,6 +181,13 @@ export default {
       else {
         this.sortIndex = null;
       }
+    },
+
+    helperBeforeLeave(el) {
+      const targetElement = this.nodeTracker.getNodes()[this.sortIndex];
+      el.style.transform = `translate3d(${this.helperTranslation.x - targetElement.offsetLeft}px, ${this.helperTranslation.y - targetElement.offsetTop}px, 0)`;
+      el.style.left = `${targetElement.offsetLeft - this.$refs.scrollContainer.scrollLeft}px`;
+      el.style.top = `${targetElement.offsetTop - this.$refs.scrollContainer.scrollTop}px`;
     },
 
     helperAfterLeave(el) {

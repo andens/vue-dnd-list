@@ -38,6 +38,7 @@ Helper item markup can be provided in a slot named `helper`. If not present, the
 
 If the list items change viewport position under circumstances beyond the control of `vue-dnd-list` while sorting is active, `synchronizeHelperTranslation` may be called on a `SortableContainer` instance to immediately synchronize the helper position. This moves the helper item into place and sorts items according to the updated position.
 
+When the facade item is removed, the `left` and `right` styles are set to match the target element position. The `transform` style is set to offset the item to where it was when dropped. With this the user can transition the facade during the settling phase. Remember, using `!important` for the `transform` property overrides the inline style.
 
 == Internal details
 
