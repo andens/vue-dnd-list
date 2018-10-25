@@ -18,6 +18,8 @@ The `activationDistance` property specifies a distance that must be dragged befo
 
 The `helperZ` property sets the z-index to use for the wrapper of the helper item. It's a bit of a hack to work around some transition issues where the use of transform creates a new stacking context for the helper item as it's being transitioned, making its z-index independent of the other items. Defaults to 0.
 
+The `maxItemTransitionDuration` property is the duration in milliseconds for items to transition into place after being swapped. It's prefixed with _max_ because it is the duration for a clean swap; interrupting currently transitioning items do not reset the transition time but rather finishes in less time based on how far they have already transitioned. A value greater than 0 enables the transition, during which a `<name>-move` class is applied, where `<name>` is given by the `transitionName` property. Defaults to 0.
+
 The `scrollContainerEvents` property is an object of event handlers that are bound to the scroll container. Defaults to null.
 
 The slot content is repeated for each element in `v-model` and scoped with the following data:

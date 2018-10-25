@@ -9,6 +9,7 @@
         <list-item
           :class="listItemClass"
           :index="index"
+          @transitionend.native="itemTransitionEnd"
         >
           <slot
             v-bind="{
@@ -100,6 +101,7 @@ export default {
     activationDelay: { type: Number, default: 0 },
     activationDistance: { type: Number, default: 0 },
     helperZ: { type: Number, default: 0 },
+    maxItemTransitionDuration: { type: Number, default: 0 },
     scrollContainerEvents: { type: Object, default: null },
   },
 
@@ -298,7 +300,69 @@ export default {
         this.sortIndex = otherIndex;
 
         this.$emit("input", this.value);
+
+        if (this.maxItemTransitionDuration > 0) {
+          this.transitionSwappedItems(sortNode, otherNode, right);
+        }
       }
+    },
+
+    transitionSwappedItems(sortNode, otherNode, right) {
+      //╔═════════════════════════════════════════════════════════════════════╗
+      //║ Note to self:                                                       ║
+      //║ The logic here is not difficult, but somewhat fragile. The order of ║
+      //║ operations is important for CSS transitions to trigger properly. Be ║
+      //║ careful with any changes in this method.                            ║
+      //╚═════════════════════════════════════════════════════════════════════╝
+
+      // To make a currently transitioning item behave properly, we use its
+      // mid-transition transform value to calculate the new transform such
+      // that it returns nicely from where it currently is.
+      const otherComputedStyle = window.getComputedStyle(otherNode).transform;
+      const otherMatrix = new WebKitCSSMatrix(otherComputedStyle);
+      const sortTranslate = (right ? 1 : -1) * (sortNode.offsetWidth + (right ? 1 : -1) * (otherMatrix.m41));
+
+      const sortComputedStyle = window.getComputedStyle(sortNode).transform;
+      const sortMatrix = new WebKitCSSMatrix(sortComputedStyle);
+      const otherTranslate = (right ? -1 : 1) * (otherNode.offsetWidth + (right ? -1 : 1) * (sortMatrix.m41));
+
+      // Reduce the transition duration based on the distance that has already
+      // been transitioned to move with an even speed. Otherwise the transition
+      // restarts with the same duration and moves more slowly due to a shorter
+      // distance being transitioned over the same period of time.
+      const sortTime = Math.min(Math.abs(sortTranslate) / sortNode.offsetWidth, 1.0) * this.maxItemTransitionDuration;
+      const otherTime = Math.min(Math.abs(otherTranslate) / otherNode.offsetWidth, 1.0) * this.maxItemTransitionDuration;
+
+      // Remove the move class and transition duration before reflow.
+      const className = `${this.transitionName}-move`;
+
+      sortNode.classList.remove(className);
+      otherNode.classList.remove(className);
+
+      sortNode.style.transitionDuration = "";
+      otherNode.style.transitionDuration = "";
+
+      sortNode.style.transform = `translateX(${sortTranslate}px)`;
+      otherNode.style.transform = `translateX(${otherTranslate}px)`;
+
+      // Force reflow to use the new translation without transition.
+      sortNode.offsetLeft;
+      otherNode.offsetLeft;
+
+      // Now we can reapply the transition duration and the move class to
+      // continue transitioning.
+      sortNode.style.transitionDuration = `${sortTime}ms`;
+      otherNode.style.transitionDuration = `${otherTime}ms`;
+
+      sortNode.classList.add(className);
+      otherNode.classList.add(className);
+    },
+
+    itemTransitionEnd(e) {
+      const className = `${this.transitionName}-move`;
+      e.target.style.transform = "";
+      e.target.style.transitionDuration = "";
+      e.target.classList.remove(className);
     },
 
     getScrollContainer() {
