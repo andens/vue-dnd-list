@@ -88,6 +88,8 @@ export default {
     startScroll: { x: 0, y: 0 }, // Container scroll at time of activation.
     latestMousePosition: { x: 0, y: 0 },
     nodeTracker: new NodeTracker(),
+    autoscrollIntervalTimer: null,
+    protrusion: 0, // Used in autoscroll to determine scroll speed.
   }),
 
   props: {
@@ -105,6 +107,8 @@ export default {
     helperZ: { type: Number, default: 0 },
     maxItemTransitionDuration: { type: Number, default: 0 },
     scrollContainerEvents: { type: Object, default: null },
+    autoscrollTopSpeed: { type: Number, default: 30 },
+    autoscrollTopSpeedProtrusion: { type: Number, default: 60 },
   },
 
   provide() {
@@ -159,6 +163,7 @@ export default {
       }
 
       this.synchronizeHelperTranslation();
+      this.autoscroll();
     },
 
     handleSortEnd(e) {
@@ -171,6 +176,12 @@ export default {
       // already fired.
       clearTimeout(this.activationTimer);
       this.activationTimer = null;
+
+      // Stop autoscrolling if active.
+      if (this.autoscrollIntervalTimer) {
+        clearInterval(this.autoscrollIntervalTimer);
+        this.autoscrollIntervalTimer = null;
+      }
 
       // Switch to the settling phase (cleanup is done when the helper has left
       // the DOM).
@@ -231,11 +242,11 @@ export default {
 
       // Set the new translation.
       if (!this.lockAxis || (this.lockAxis && this.orientation === "x")) {
-      const {scrollLeft} = this.$refs.scrollContainer;
+        const {scrollLeft} = this.$refs.scrollContainer;
         this.helperTranslation.x = this.helperStartPosition.x + (this.latestMousePosition.x - this.startPosition.x) + (scrollLeft - this.startScroll.x);
       }
       if (!this.lockAxis || (this.lockAxis && this.orientation === "y")) {
-      const {scrollTop} = this.$refs.scrollContainer;
+        const {scrollTop} = this.$refs.scrollContainer;
         this.helperTranslation.y = this.helperStartPosition.y + (this.latestMousePosition.y - this.startPosition.y) + (scrollTop - this.startScroll.y);
       }
 
@@ -381,6 +392,98 @@ export default {
 
     getScrollContainer() {
       return this.$refs.scrollContainer;
+    },
+
+    autoscroll() {
+      if (!this.sorting) {
+        return;
+      }
+
+      if (!this.nodeTracker.getHelperNode()) {
+        return;
+      }
+
+      // Calculate how far outside the scroll container we are.
+      this.calculateHelperProtrusionOutsideContainer();
+
+      // Disable autoscroll if we are no longer within the autoscroll bounds.
+      if (this.protrusion === 0) {
+        if (this.autoscrollIntervalTimer) {
+          clearInterval(this.autoscrollIntervalTimer);
+          this.autoscrollIntervalTimer = null;
+        }
+        return;
+      }
+
+      if (this.autoscrollIntervalTimer) {
+        return;
+      }
+
+      this.autoscrollIntervalTimer = setInterval(this.autoscrollIteration, 30);
+    },
+
+    calculateHelperProtrusionOutsideContainer() {
+      this.protrusion = 0;
+      const helperRect = this.nodeTracker.getHelperNode().getBoundingClientRect();
+      const scrollRect = this.$refs.scrollContainer.getBoundingClientRect();
+      if (this.orientation === "x") {
+        const left = helperRect.left - scrollRect.left;
+        const right = helperRect.right - scrollRect.right;
+        if (left < 0) {
+          this.protrusion = left;
+        }
+        else if (right > 0) {
+          this.protrusion = right;
+        }
+      }
+      else {
+        const top = helperRect.top - scrollRect.top;
+        const bottom = helperRect.bottom - scrollRect.bottom;
+        if (top < 0) {
+          this.protrusion = top;
+        }
+        else if (bottom > 0) {
+          this.protrusion = bottom;
+        }
+      }
+    },
+
+    autoscrollIteration() {
+      const horizontal = this.orientation === "x";
+      const scrollSpeed = Math.min(1.0, Math.abs(this.protrusion) / this.autoscrollTopSpeedProtrusion) * this.autoscrollTopSpeed * Math.sign(this.protrusion);
+
+      if (horizontal) {
+        this.$refs.scrollContainer.scrollLeft += scrollSpeed;
+      }
+      else {
+        this.$refs.scrollContainer.scrollTop += scrollSpeed;
+      }
+
+      this.synchronizeHelperTranslation();
+
+      const { scrollLeft, scrollTop, scrollWidth, scrollHeight, clientWidth, clientHeight } = this.$refs.scrollContainer;
+
+      // Avoid choppy movement by explicitly setting the helper position.
+      // Such artifacts were particularly visible for slow movements opposite
+      // to the autoscroll direction. I assume that the reason this works is
+      // that the animation frame is called just before rendering and at that
+      // time we can set the final position without waiting for Vue to update
+      // reactive bindings and thus lag behind.
+      if (this.nodeTracker.getHelperNode()) {
+        let s = this.nodeTracker.getHelperNode().style;
+        s.left = `${this.helperTranslation.x - scrollLeft}px`;
+        s.top = `${this.helperTranslation.y - scrollTop}px`;
+      }
+
+      let cancelAutoscroll = false;
+      cancelAutoscroll |= horizontal && this.protrusion > 0 && scrollLeft >= (scrollWidth - clientWidth);
+      cancelAutoscroll |= horizontal && this.protrusion < 0 && scrollLeft <= 0;
+      cancelAutoscroll |= !horizontal && this.protrusion > 0 && scrollTop >= (scrollHeight - clientHeight);
+      cancelAutoscroll |= !horizontal && this.protrusion < 0 && scrollTop <= 0;
+      if (cancelAutoscroll) {
+        clearInterval(this.autoscrollIntervalTimer);
+        this.autoscrollIntervalTimer = null;
+      }
     },
   },
 

@@ -24,6 +24,10 @@ The `maxItemTransitionDuration` property is the duration in milliseconds for ite
 
 The `scrollContainerEvents` property is an object of event handlers that are bound to the scroll container. Defaults to null.
 
+The `autoscrollTopSpeed` property is the maximum scroll speed when autoscrolling.
+
+The `autoscrollTopSpeedProtrusion` is the protrusion at which the autoscroll reaches its maximum scroll speed.
+
 The slot content is repeated for each element in `v-model` and scoped with the following data:
 
 * `listItem` - Element data of `v-model`.
