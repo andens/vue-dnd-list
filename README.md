@@ -53,3 +53,7 @@ When the facade item is removed, the `left` and `right` styles are set to match 
 Directives were investigated, but a separate component could look for changes specifically in index. Considering that it didn't work to just pass the container instance, a separate object had to be used and dependency injection turned out to be a clean way of doing so (as in vue-slicksort).
 
 The helper node is also tracked in `NodeTracker`. Emitting an event from the helper item component when it's destroyed doesn't work as the transition continues. Instead, we need to check whether the `after-leave` invocation was done for the helper node. Using the node tracker we can compare against the element that the helper added.
+
+== Inspiration
+
+This is a support library for `vue-chromish-tabs` and written with its requirements in mind. `vue-dnd-list` is heavily inspired by `vue-slicksort`, but adapted mostly in terms of using slots and with different swapping and autoscroll behaviors. `vue-dnd-list` was written with my use case of a horizontal sortable list in mind. Although untested, the component includes equivalent functionality for a vertical list.
