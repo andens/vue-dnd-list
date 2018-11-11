@@ -1,3 +1,5 @@
+## Usage
+
 The `orientation` property determines whether the list is horizontal (`x`) or vertical (`y`).
 
 The `lockAxis` property locks dragging to the axis defined by the `orientation` property if true. Otherwise the facade item may be moved freely. Defaults to false.
@@ -46,7 +48,7 @@ If the list items change viewport position under circumstances beyond the contro
 
 When the facade item is removed, the `left` and `right` styles are set to match the target element position. The `transform` style is set to offset the item to where it was when dropped. With this the user can transition the facade during the settling phase. Remember, using `!important` for the `transform` property overrides the inline style.
 
-== Internal details
+## Internal details
 
 `NodeTracker` is used to track a sorted array of nodes that corresponds to the elements in `value`. `ListItem` instances update the tracker as they are created, destroyed, and detect changes in their `index` property.
 
@@ -54,6 +56,6 @@ Directives were investigated, but a separate component could look for changes sp
 
 The helper node is also tracked in `NodeTracker`. Emitting an event from the helper item component when it's destroyed doesn't work as the transition continues. Instead, we need to check whether the `after-leave` invocation was done for the helper node. Using the node tracker we can compare against the element that the helper added.
 
-== Inspiration
+## Inspiration
 
 This is a support library for `vue-chromish-tabs` and written with its requirements in mind. `vue-dnd-list` is heavily inspired by `vue-slicksort`, but adapted mostly in terms of using slots and with different swapping and autoscroll behaviors. `vue-dnd-list` was written with my use case of a horizontal sortable list in mind. Although untested, the component includes equivalent functionality for a vertical list.
