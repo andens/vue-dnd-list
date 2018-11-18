@@ -198,8 +198,17 @@ export default {
     helperBeforeLeave(el) {
       const targetElement = this.nodeTracker.getNodes()[this.sortIndex];
       el.style.transform = `translate3d(${this.helperTranslation.x - targetElement.offsetLeft}px, ${this.helperTranslation.y - targetElement.offsetTop}px, 0)`;
-      el.style.left = `${targetElement.offsetLeft - this.$refs.scrollContainer.scrollLeft}px`;
-      el.style.top = `${targetElement.offsetTop - this.$refs.scrollContainer.scrollTop}px`;
+      
+      // During the settling phase we give `helperTranslation` the purpose of
+      // representing the target position to easily tweak it when scrolling.
+      this.helperTranslation.x = targetElement.offsetLeft;
+      this.helperTranslation.y = targetElement.offsetTop;
+      
+      // Set the style ourselves. I'm not sure, but it seems that during leave
+      // transitions either the element is replaced with a new one or bindings
+      // no longer apply.
+      el.style.left = `${this.helperTranslation.x - this.$refs.scrollContainer.scrollLeft}px`;
+      el.style.top = `${this.helperTranslation.y - this.$refs.scrollContainer.scrollTop}px`;
     },
 
     helperAfterLeave(el) {
@@ -235,6 +244,16 @@ export default {
 
     synchronizeHelperTranslation() {
       if (!this.sorting) {
+        if (this.settling) {
+          // Scroll during settling must manually update the helper position
+          // because the reactive bindings no longer seem to apply then. Note
+          // that `helperTranslation` is the target position set when the leave
+          // transition began.
+          let helperStyle = this.nodeTracker.getHelperNode().style;
+          helperStyle.left = `${this.helperTranslation.x - this.$refs.scrollContainer.scrollLeft}px`;
+          helperStyle.top = `${this.helperTranslation.y - this.$refs.scrollContainer.scrollTop}px`;
+        }
+
         return;
       }
 
