@@ -343,20 +343,35 @@ export default {
       // To make a currently transitioning item behave properly, we use its
       // mid-transition transform value to calculate the new transform such
       // that it returns nicely from where it currently is.
-      const otherComputedStyle = window.getComputedStyle(otherNode).transform;
-      const otherMatrix = new WebKitCSSMatrix(otherComputedStyle);
-      const sortTranslate = (right ? 1 : -1) * (sortNode.offsetWidth + (right ? 1 : -1) * (otherMatrix.m41));
-
-      const sortComputedStyle = window.getComputedStyle(sortNode).transform;
-      const sortMatrix = new WebKitCSSMatrix(sortComputedStyle);
-      const otherTranslate = (right ? -1 : 1) * (otherNode.offsetWidth + (right ? -1 : 1) * (sortMatrix.m41));
+      const otherComputedStyle = window.getComputedStyle(otherNode);
+      const sortComputedStyle = window.getComputedStyle(sortNode);
+      const otherOuterWidth =
+        ["left", "right"]
+        .map(side => {
+          return parseInt(otherComputedStyle[`margin-${side}`], 10);
+        })
+        .reduce((total, side) => {
+          return total + side;
+        }, otherNode.offsetWidth);
+      const sortOuterWidth =
+        ["left", "right"]
+        .map(side => {
+          return parseInt(sortComputedStyle[`margin-${side}`], 10);
+        })
+        .reduce((total, side) => {
+          return total + side;
+        }, sortNode.offsetWidth);
+      const otherMatrix = new WebKitCSSMatrix(otherComputedStyle.transform);
+      const sortMatrix = new WebKitCSSMatrix(sortComputedStyle.transform);
+      const otherTranslate = (right ? -1 : 1) * (otherOuterWidth + (right ? -1 : 1) * (sortMatrix.m41));
+      const sortTranslate = (right ? 1 : -1) * (sortOuterWidth + (right ? 1 : -1) * (otherMatrix.m41));
 
       // Reduce the transition duration based on the distance that has already
       // been transitioned to move with an even speed. Otherwise the transition
       // restarts with the same duration and moves more slowly due to a shorter
       // distance being transitioned over the same period of time.
-      const sortTime = Math.min(Math.abs(sortTranslate) / sortNode.offsetWidth, 1.0) * this.maxItemTransitionDuration;
-      const otherTime = Math.min(Math.abs(otherTranslate) / otherNode.offsetWidth, 1.0) * this.maxItemTransitionDuration;
+      const sortTime = Math.min(Math.abs(sortTranslate) / sortOuterWidth, 1.0) * this.maxItemTransitionDuration;
+      const otherTime = Math.min(Math.abs(otherTranslate) / otherOuterWidth, 1.0) * this.maxItemTransitionDuration;
 
       // Remove the move class and transition duration before reflow.
       const className = `${this.transitionName}-move`;
