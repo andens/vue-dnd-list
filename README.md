@@ -40,6 +40,8 @@ With a terminator item this doesn't happen because there is another element the 
 `listTerminatorClass`: The class that will be applied to the terminator item.
 Defaults to `dnd-terminator`.
 
+`reverse-rendering`: Switches internal logic to account for a reversed rendering order of list items when for example `flex-direction: row-reverse` is used.
+
 The `sort-end` event is emitted when sorting finishes. If sorting has become activated, this happens when the mouse button is released, otherwise it happens when the helper item has settled into place.
 
 The slot content is repeated for each element in `v-model` and scoped with the following data:
@@ -67,6 +69,32 @@ When the facade item is removed, the `left` and `right` styles are set to match 
 Directives were investigated, but a separate component could look for changes specifically in index. Considering that it didn't work to just pass the container instance, a separate object had to be used and dependency injection turned out to be a clean way of doing so (as in vue-slicksort).
 
 The helper node is also tracked in `NodeTracker`. Emitting an event from the helper item component when it's destroyed doesn't work as the transition continues. Instead, we need to check whether the `after-leave` invocation was done for the helper node. Using the node tracker we can compare against the element that the helper added.
+
+### Reverse rendering
+
+In order to support using `flex-direction: row-reverse` (or column) for the scroll container, some calculations have to be done differently.
+This mostly applies to calculations of `helperTranslation`, where we can't use `offsetLeft`/`offsetTop` directly because in this case they don't work the same.
+
+Normally, `offsetLeft` of items would look something like this with respect to the scroll container (a is the maximum `scrollLeft` value and b is `scrollWidth`):
+```
+0                         a             b
+┍━━━━━━━━━━━━━━━━━━━━━┑
+┃◁                       ############▷┃
+┕━━━━━━━━━━━━━━━━━━━━━┙
+```
+
+When using reverse rendering, it seemed to look like this instead:
+```
+-a                        0             b-a
+┍━━━━━━━━━━━━━━━━━━━━━┑
+┃◁                       ############▷┃
+┕━━━━━━━━━━━━━━━━━━━━━┙
+```
+
+For that reason, usage of `offsetLeft` and `offsetTop` values are shifted accordingly to bring them into the coordinate system that is assumed for other calculations.
+
+However, that is not enough.
+Reversing elements also reverses the item indices, which is why the checking direction is inverted when sorting items and swapping them.
 
 ## Inspiration
 
