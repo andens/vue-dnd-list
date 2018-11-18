@@ -30,6 +30,16 @@ The `autoscrollTopSpeed` property is the maximum scroll speed when autoscrolling
 
 The `autoscrollTopSpeedProtrusion` is the protrusion at which the autoscroll reaches its maximum scroll speed.
 
+`listTerminator`: If true, an empty div is inserted after the last list item.
+Defaults to false.
+
+_The original reason for adding a terminator item was to prevent collapsing behavior when swapping the rightmost item when the scroll container is a flexbox.
+Without the terminator item the flexbox would shrink to fit the items being translated, causing choppy autoscroll behavior.
+With a terminator item this doesn't happen because there is another element the container must wrap, albeit invisible._
+
+`listTerminatorClass`: The class that will be applied to the terminator item.
+Defaults to `dnd-terminator`.
+
 The `sort-end` event is emitted when sorting finishes. If sorting has become activated, this happens when the mouse button is released, otherwise it happens when the helper item has settled into place.
 
 The slot content is repeated for each element in `v-model` and scoped with the following data:

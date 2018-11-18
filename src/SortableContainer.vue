@@ -24,6 +24,7 @@
           />
         </list-item>
       </transition>
+      <div v-if="listTerminator" :class="listTerminatorClass" />
     </div>
     <transition
       :name="transitionName"
@@ -109,6 +110,8 @@ export default {
     scrollContainerEvents: { type: Object, default: null },
     autoscrollTopSpeed: { type: Number, default: 30 },
     autoscrollTopSpeedProtrusion: { type: Number, default: 60 },
+    listTerminator: { type: Boolean, default: false },
+    listTerminatorClass: { type: String, default: "dnd-terminator" },
   },
 
   provide() {
