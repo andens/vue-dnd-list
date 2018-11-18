@@ -30,6 +30,8 @@ The `autoscrollTopSpeed` property is the maximum scroll speed when autoscrolling
 
 The `autoscrollTopSpeedProtrusion` is the protrusion at which the autoscroll reaches its maximum scroll speed.
 
+The `sort-end` event is emitted when sorting finishes. If sorting has become activated, this happens when the mouse button is released, otherwise it happens when the helper item has settled into place.
+
 The slot content is repeated for each element in `v-model` and scoped with the following data:
 
 * `listItem` - Element data of `v-model`.
