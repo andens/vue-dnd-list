@@ -115,16 +115,6 @@ export default {
     reverseRendering: { type: Boolean, default: false },
   },
 
-  computed: {
-    offsetLeftShift() {
-      return this.reverseRendering && this.orientation === "x" ? this.$refs.scrollContainer.scrollWidth - this.$refs.scrollContainer.offsetWidth : 0;
-    },
-
-    offsetTopShift() {
-      return this.reverseRendering && this.orientation === "y" ? this.$refs.scrollContainer.scrollHeight - this.$refs.scrollContainer.offsetHeight : 0;
-    },
-  },
-
   provide() {
     return {
       nodeTracker: this.nodeTracker,
@@ -212,12 +202,12 @@ export default {
 
     helperBeforeLeave(el) {
       const targetElement = this.nodeTracker.getNodes()[this.sortIndex];
-      el.style.transform = `translate3d(${this.helperTranslation.x - (targetElement.offsetLeft + this.offsetLeftShift)}px, ${this.helperTranslation.y - (targetElement.offsetTop + this.offsetTopShift)}px, 0)`;
+      el.style.transform = `translate3d(${this.helperTranslation.x - (targetElement.offsetLeft + this.offsetLeftShift())}px, ${this.helperTranslation.y - (targetElement.offsetTop + this.offsetTopShift())}px, 0)`;
       
       // During the settling phase we give `helperTranslation` the purpose of
       // representing the target position to easily tweak it when scrolling.
-      this.helperTranslation.x = (targetElement.offsetLeft + this.offsetLeftShift);
-      this.helperTranslation.y = (targetElement.offsetTop + this.offsetTopShift);
+      this.helperTranslation.x = (targetElement.offsetLeft + this.offsetLeftShift());
+      this.helperTranslation.y = (targetElement.offsetTop + this.offsetTopShift());
       
       // Set the style ourselves. I'm not sure, but it seems that during leave
       // transitions either the element is replaced with a new one or bindings
@@ -247,8 +237,8 @@ export default {
 
     activateSorting() {
       const sortNode = this.nodeTracker.getNodes()[this.sortIndex];
-      this.helperStartPosition.x = (sortNode.offsetLeft + this.offsetLeftShift);
-      this.helperStartPosition.y = (sortNode.offsetTop + this.offsetTopShift);
+      this.helperStartPosition.x = (sortNode.offsetLeft + this.offsetLeftShift());
+      this.helperStartPosition.y = (sortNode.offsetTop + this.offsetTopShift());
       this.helperTranslation.x = this.helperStartPosition.x;
       this.helperTranslation.y = this.helperStartPosition.y;
       this.startPosition.x = this.latestMousePosition.x;
@@ -542,6 +532,14 @@ export default {
 
     informSortEnd() {
       this.$emit("sort-end");
+    },
+
+    offsetLeftShift() {
+      return this.reverseRendering && this.orientation === "x" ? this.$refs.scrollContainer.scrollWidth - this.$refs.scrollContainer.offsetWidth : 0;
+    },
+
+    offsetTopShift() {
+      return this.reverseRendering && this.orientation === "y" ? this.$refs.scrollContainer.scrollHeight - this.$refs.scrollContainer.offsetHeight : 0;
     },
   },
 
