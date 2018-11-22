@@ -99,3 +99,7 @@ Reversing elements also reverses the item indices, which is why the checking dir
 ## Inspiration
 
 This is a support library for `vue-chromish-tabs` and written with its requirements in mind. `vue-dnd-list` is heavily inspired by `vue-slicksort`, but adapted mostly in terms of using slots and with different swapping and autoscroll behaviors. `vue-dnd-list` was written with my use case of a horizontal sortable list in mind. Although untested, the component includes equivalent functionality for a vertical list.
+
+## To future self
+
+I should probably scrap the transitions. `transition-group` didn't play nice with swapping items mid-transition, and individual `transition` elements don't seem to trigger enter transitions (likely because the `transition` element itself is removed; not the element within it). Leave transitions do seem to trigger, but since items are not in a group the placeholder item is simply appended instead of considering the other items.
