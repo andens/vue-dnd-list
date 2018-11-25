@@ -1,29 +1,25 @@
 <template>
   <div ref="container">
     <div ref="scrollContainer" :class="scrollContainerClass" v-on="scrollContainerEvents">
-      <transition
-        :name="transitionName"
+      <list-item
         v-for="(listItem, index) in value"
         :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
+        :class="listItemClass"
+        :index="index"
+        @transitionend.native="itemTransitionEnd"
       >
-        <list-item
-          :class="listItemClass"
-          :index="index"
-          @transitionend.native="itemTransitionEnd"
-        >
-          <slot
-            v-bind="{
-              listItem,
-              index,
-              isGhost: sortIndex === index,
-              isHelper: false,
-              sorting,
-              settling,
-              startDrag: (e) => handleStart(e, index),
-            }"
-          />
-        </list-item>
-      </transition>
+        <slot
+          v-bind="{
+            listItem,
+            index,
+            isGhost: sortIndex === index,
+            isHelper: false,
+            sorting,
+            settling,
+            startDrag: e => handleStart(e, index),
+          }"
+        />
+      </list-item>
       <div v-if="listTerminator" :class="listTerminatorClass" />
     </div>
     <transition
@@ -405,26 +401,28 @@ export default {
       // Remove the move class and transition duration before reflow.
       const className = `${this.transitionName}-move`;
 
-      sortNode.classList.remove(className);
-      otherNode.classList.remove(className);
+      this.$nextTick(() => {
+        sortNode.classList.remove(className);
+        otherNode.classList.remove(className);
 
-      sortNode.style.transitionDuration = "";
-      otherNode.style.transitionDuration = "";
+        sortNode.style.transitionDuration = "";
+        otherNode.style.transitionDuration = "";
 
-      sortNode.style.transform = `translateX(${sortTranslate}px)`;
-      otherNode.style.transform = `translateX(${otherTranslate}px)`;
+        sortNode.style.transform = `translateX(${otherTranslate}px)`;
+        otherNode.style.transform = `translateX(${sortTranslate}px)`;
 
-      // Force reflow to use the new translation without transition.
-      sortNode.offsetLeft;
-      otherNode.offsetLeft;
+        // Force reflow to use the new translation without transition.
+        sortNode.offsetLeft;
+        otherNode.offsetLeft;
 
-      // Now we can reapply the transition duration and the move class to
-      // continue transitioning.
-      sortNode.style.transitionDuration = `${sortTime}ms`;
-      otherNode.style.transitionDuration = `${otherTime}ms`;
+        // Now we can reapply the transition duration and the move class to
+        // continue transitioning.
+        sortNode.style.transitionDuration = `${otherTime}ms`;
+        otherNode.style.transitionDuration = `${sortTime}ms`;
 
-      sortNode.classList.add(className);
-      otherNode.classList.add(className);
+        sortNode.classList.add(className);
+        otherNode.classList.add(className);
+      });
     },
 
     itemTransitionEnd(e) {
