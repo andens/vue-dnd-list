@@ -5,6 +5,7 @@
         v-for="(listItem, index) in value"
         :key="itemKeyProperty ? listItem[itemKeyProperty] : index"
         :class="listItemClass"
+        :style="listItem.style"
         :index="index"
         @transitionend.native="itemTransitionEnd"
       >
