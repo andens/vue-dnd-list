@@ -1,3 +1,7 @@
+# vue-dnd-list
+
+Support library that provides the sorting logic of `vue-chromish-tabs`.
+
 ## Usage
 
 The `orientation` property determines whether the list is horizontal (`x`) or vertical (`y`).
