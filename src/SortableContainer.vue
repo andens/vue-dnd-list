@@ -193,7 +193,7 @@ export default {
       // If sorting has not yet begun, cleanup what was set in `handleStart`.
       else {
         this.sortIndex = null;
-        this.informSortEnd();
+        this.informSortEnd(false);
       }
     },
 
@@ -216,7 +216,7 @@ export default {
     helperAfterLeave(el) {
       this.sortIndex = null;
       this.settling = false;
-      this.informSortEnd();
+      this.informSortEnd(true);
     },
 
     checkActivationDistanceConstraint() {
@@ -529,8 +529,8 @@ export default {
       }
     },
 
-    informSortEnd() {
-      this.$emit("sort-end");
+    informSortEnd(wasSortingActive) {
+      this.$emit("sort-end", wasSortingActive);
     },
 
     offsetLeftShift() {
